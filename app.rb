@@ -264,11 +264,11 @@ end
 Cuba.use Rack::Static, root: "public", urls: ["/css", "/js", "/img"]
 
 Cuba.define do
-  on get, path("") do
+  on get, "" do
     res.redirect "/geocode"
   end
 
-  on get, path("geocode"), param("address"), param("lat"), param("lng") do |address, lat, lng|
+  on get, "geocode", param("address"), param("lat"), param("lng") do |address, lat, lng|
     if lat && lng
       result_set = Geocoder.draw(address, lat, lng)
     else
@@ -279,7 +279,7 @@ Cuba.define do
       res.write JSON.dump(result_set.to_hash)
     end
 
-    on path("map.png"), param("size"), param("zoom") do |size, zoom|
+    on "map.png", param("size"), param("zoom") do |size, zoom|
       if result_set.exact_match?
         map = open(Geocoder.map(result_set.latitude, result_set.longitude, size || "400x300", zoom || 16))
         res["Content-Type"] = "image/png"
@@ -301,7 +301,7 @@ Cuba.define do
     end
   end
 
-  on get, path("streets.json"), param("term") do |search|
+  on get, "streets.json", param("term") do |search|
     street = Geocoder::Address.parse(search).street
     comparer = Geocoder::StreetComparer.new(street)
 
