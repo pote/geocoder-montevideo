@@ -48,7 +48,7 @@ end
 scope do
   test "Homepage redirects to /geocode" do
     visit "/"
-    assert current_path == "/geocode"
+    assert current_path == "/geocode/"
   end
 
   test "Empty page loads fine" do
