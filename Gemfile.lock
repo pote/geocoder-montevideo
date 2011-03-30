@@ -1,0 +1,24 @@
+GIT
+  remote: https://github.com/foca/cuba.git
+  revision: 89a59e25cea837f8efca3876e1e888c62632ca7e
+  specs:
+    cuba (2.0.0.rc3)
+      rack (~> 1.2)
+      tilt (~> 1.2)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    clogger (0.9.0)
+      rack (> 0.9)
+    rack (1.2.2)
+    text (0.2.0)
+    tilt (1.2.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  clogger
+  cuba!
+  text
