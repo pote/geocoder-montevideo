@@ -1,5 +1,6 @@
 require "uri"
 require "./app"
+require "clogger"
 
 class Redirector
   def initialize(app, domain_with_port=nil, status=301)
@@ -43,5 +44,10 @@ end
 if ENV["RACK_ENV"] == "production"
   use Redirector, "acavamos.com"
 end
+
+use Clogger,
+    :format => Clogger::Format::Combined,
+    :path => "acavamos.log",
+    :reentrant => true
 
 run Cuba
