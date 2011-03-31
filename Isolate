@@ -1,0 +1,9 @@
+gem "cuba"
+gem "text"
+gem "clogger"
+
+env :development do
+  gem "cutest"
+  gem "capybara"
+  gem "ruby-debug19"
+end

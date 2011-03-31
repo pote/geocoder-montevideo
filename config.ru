@@ -1,6 +1,5 @@
 require 'rubygems'
-require 'bundler'
-Bundler.require(:default, ENV['RACK_ENV'])
+require 'isolate/now'
 require "uri"
 require "./app"
 require "clogger"
