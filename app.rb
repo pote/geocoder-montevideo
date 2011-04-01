@@ -261,51 +261,64 @@ class Cuba::Ron
   end
 end
 
-Cuba.use Rack::Static, root: "public", urls: ["/css", "/js", "/img"]
+Cuba.use Rack::Static, root: "public", urls: ["/css", "/js", "/img", "/favicon.ico"]
 
 Cuba.define do
   on get, "" do
     res.redirect "/geocode"
   end
 
-  on get, "geocode", param("address"), param("lat"), param("lng") do |address, lat, lng|
-    if lat && lng
-      result_set = Geocoder.draw(address, lat, lng)
-    else
-      result_set = Geocoder.find(address)
-    end
+  on get do
+    on "geocode" do
+      on param("address") do |address|
+        result_set = Geocoder.find(address)
+        res.write render("views/results.erb", results: result_set, address: address)
+      end
 
-    on accept("application/json") do
-      res.write JSON.dump(result_set.to_hash)
-    end
+      on accept("application/json") do
+        res.write JSON.dump(result_set.to_hash)
+      end
 
-    on "map.png", param("size"), param("zoom") do |size, zoom|
-      if result_set.exact_match?
-        map = open(Geocoder.map(result_set.latitude, result_set.longitude, size || "400x300", zoom || 16))
-        res["Content-Type"] = "image/png"
-        res.write map.read
-      elsif result_set.any?
-        res.status = 300
-      else
-        res.status = 404
+      on "map.png", param("size"), param("zoom") do |size, zoom|
+        if result_set.exact_match?
+          map = open(Geocoder.map(result_set.latitude, result_set.longitude, size || "400x300", zoom || 16))
+          res["Content-Type"] = "image/png"
+          res.write map.read
+        elsif result_set.any?
+          res.status = 300
+        else
+          res.status = 404
+        end
+      end
+
+      on accept("text/javascript") do
+        res["Content-Type"] = "text/html"
+        res.write render("views/results.erb", results: result_set, address: address)
+      end
+
+      on default do
+        result_set ||= Geocoder.find("")
+        address ||= ""
+        res.write render("views/home.erb", results: result_set, address: address)
       end
     end
 
-    on accept("text/javascript") do
-      res["Content-Type"] = "text/html"
-      res.write render("views/results.erb", results: result_set, address: address)
-    end
+    on "streets.json", param("term") do |search|
+      street = Geocoder::Address.parse(search).street
+      comparer = Geocoder::StreetComparer.new(street)
 
-    on default do
-      res.write render("views/home.erb", results: result_set, address: address)
+      res["Content-Type"] = "application/json"
+      res.write JSON.dump(comparer.matches)
     end
   end
 
-  on get, "streets.json", param("term") do |search|
-    street = Geocoder::Address.parse(search).street
-    comparer = Geocoder::StreetComparer.new(street)
+  on get, "otro" do
+    if lat && lng
+      result_set = Geocoder.draw(address, lat, lng)
+    else
+    end
 
-    res["Content-Type"] = "application/json"
-    res.write JSON.dump(comparer.matches)
+
   end
+
 end
